@@ -9,6 +9,7 @@ import java.awt.Color;
 import javax.swing.JEditorPane;
 import java.awt.Font;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -97,8 +98,8 @@ public class YeniPencere extends JFrame {
 	private JTextPane txtpnInstructionCycle;
 	private JCheckBox chckbxSes;
 	private int clock;
-	private int wait = 500;
-	private boolean runFlag = true;
+	public int wait = 300;
+	public boolean runFlag = true;
 	private JTable table;
 	private RAM ram;
 	private Processor cpu;
@@ -176,15 +177,15 @@ public class YeniPencere extends JFrame {
 			sira.add(an);
 		}
 	}
-	
-	
+
+
 	public void exec() {
+		int eskiBekleme = wait;
 		timer = new Timer(wait, new ActionListener() {
 	        public void actionPerformed(ActionEvent e1) {
 	        	try {
-	        		long start = System.nanoTime();
-		        	cpu.execute();
-		        	traceList(new Moment(clock, befAdr, instDecode(befIns), cpu.getAccumulator().getValue()));
+	        		cpu.execute();
+	        		traceList(new Moment(clock, befAdr, instDecode(befIns), cpu.getAccumulator().getValue()));
 					textPrgCnt.setText(threeDigit(cpu.getProgramCounter().getValue()));
 					textAcc.setText(threeDigit(cpu.getAccumulator().getValue()));
 					txtpnIns.setText(instDecode(befIns));
@@ -206,31 +207,39 @@ public class YeniPencere extends JFrame {
 						traceView.setValueAt(m.getValAcc(), i, 3);
 						i++;
 					}
-					long end = System.nanoTime();
+					/*long end = System.nanoTime();
 					say++;
 					top = top + (end-start);
 					//System.out.println("Execution time is " + (end-start));
-					System.out.println(say + " " + top);
-					if(!runFlag || befIns<100)
+					System.out.println(say + " " + top);*/
+					if(!runFlag || befIns<100) {
+						runFlag = true;
 						timer.stop();
-	        	} catch (invalidAddressException e) {
+		        	}
+					else if(wait != eskiBekleme) {
+		        		timer.setInitialDelay(wait);
+		        		timer.restart();
+		        		//timer.stop();
+		        	}
+	        	} catch (invalidAddressException e2) {
 					// TODO Auto-generated catch block
-					JOptionPane.showMessageDialog(getOwner(), "geçersiz bir adres kullanýldý", "Hata", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(getOwner(), "geÃ§ersiz bir adres kullanÄ±ldÄ±", "Hata", JOptionPane.ERROR_MESSAGE);
 					timer.stop();
-	        	} catch (regOverflowException e) {
+	        	} catch (regOverflowException e2) {
 					// TODO Auto-generated catch block
-					JOptionPane.showMessageDialog(getOwner(), "register mevcut deðeri saklamak için yetersiz", "Hata", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(getOwner(), "register mevcut deÄŸeri saklamak iÃ§in yetersiz", "Hata", JOptionPane.ERROR_MESSAGE);
 					timer.stop();
-	        	} catch (InterruptedException e) {
+	        	} catch (InterruptedException e2) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					e2.printStackTrace();
 					timer.stop();
 				}
 	        }
 	    });
 		timer.start();
 	}
-	
+
+
 	public YeniPencere(RAM ram) {
 		this.ram = ram;
 		this.cpu = new Processor(ram);
@@ -263,6 +272,7 @@ public class YeniPencere extends JFrame {
 		slider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				wait = slider.getValue() * 10;
+				System.out.println(wait);
 			}
 		});
 		slider.setSnapToTicks(true);
@@ -318,10 +328,10 @@ public class YeniPencere extends JFrame {
 					}
 				} catch (invalidAddressException eq) {
 					// TODO Auto-generated catch block
-					JOptionPane.showMessageDialog(getOwner(), "geçersiz bir adres kullanýldý", "Hata", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(getOwner(), "geÃ§ersiz bir adres kullanÄ±ldÄ±", "Hata", JOptionPane.ERROR_MESSAGE);
 				} catch (regOverflowException eq) {
 					// TODO Auto-generated catch block
-					JOptionPane.showMessageDialog(getOwner(), "register mevcut deðeri saklamak için yetersiz", "Hata", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(getOwner(), "register mevcut deÄŸeri saklamak iÃ§in yetersiz", "Hata", JOptionPane.ERROR_MESSAGE);
 				} catch (InterruptedException eq) {
 					// TODO Auto-generated catch block
 					eq.printStackTrace();
@@ -338,7 +348,7 @@ public class YeniPencere extends JFrame {
 					textPrgCnt.setText(threeDigit(cpu.getProgramCounter().getValue()));
 				} catch (regOverflowException e1) {
 					// TODO Auto-generated catch block
-					JOptionPane.showMessageDialog(getOwner(), "register mevcut deðeri saklamak için yetersiz", "Hata", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(getOwner(), "register mevcut deÄŸeri saklamak iÃ§in yetersiz", "Hata", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -369,7 +379,7 @@ public class YeniPencere extends JFrame {
 					.addContainerGap())
 		);
 		
-		JCheckBox chckbxKaynakKoduGster = new JCheckBox("Kaynak kodu göster");
+		JCheckBox chckbxKaynakKoduGster = new JCheckBox("Kaynak kodu gÃ¶ster");
 		chckbxKaynakKoduGster.setBackground(Color.LIGHT_GRAY);
 		panel_4.add(chckbxKaynakKoduGster);
 		
@@ -429,7 +439,7 @@ public class YeniPencere extends JFrame {
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		
 		JPanel tab1 = new JPanel();
-		tabbedPane.addTab("Donaným", null, tab1, null);
+		tabbedPane.addTab("DonanÄ±m", null, tab1, null);
 		tabbedPane.setEnabledAt(0, true);
 		
 		JPanel panel_6 = new JPanel();
