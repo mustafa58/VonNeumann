@@ -270,7 +270,7 @@ public class Arayuz {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				YeniPencere y = new YeniPencere(ram);
+				YeniPencere y = new YeniPencere(ram, editor.getText());
 				y.setVisible(true);
 			}
 		});
@@ -395,6 +395,8 @@ public class Arayuz {
 				JFileChooser jfc = new JFileChooser();     
 		        File file = new File(System.getProperty("user.dir"));
 		        jfc.setCurrentDirectory(file);
+		        FileNameExtensionFilter typefilter = new FileNameExtensionFilter("vvm files (*.vvm)", "vvm");
+		        jfc.setFileFilter(typefilter);
 		        jfc.setApproveButtonText("Save");
 		        jfc.setDialogTitle("Save Source File:");
 		        jfc.showOpenDialog(frame);
@@ -410,6 +412,23 @@ public class Arayuz {
 		mnDosya.add(mnitmKaydet);
 		
 		JMenuItem mnitmFarklKaydet = new JMenuItem("Save As");
+		mnitmFarklKaydet.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser jfc = new JFileChooser();     
+		        File file = new File(System.getProperty("user.dir"));
+		        jfc.setCurrentDirectory(file);
+		        jfc.setApproveButtonText("Save");
+		        jfc.setDialogTitle("Save Source File:");
+		        jfc.showOpenDialog(frame);
+				try(FileWriter fw = new FileWriter(jfc.getSelectedFile())) {
+				    fw.write(editor.getText());
+				    fw.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 		mnDosya.add(mnitmFarklKaydet);
 		
 		JMenuItem mnitmExit = new JMenuItem("Exit");

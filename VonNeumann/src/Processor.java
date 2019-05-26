@@ -2,6 +2,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 
@@ -57,6 +58,7 @@ public class Processor {
 	}
 	
 	private RAM ram;
+	private JEditorPane debugLog;
 	private int wait = 1000;
 	private Register accumulator = new Register("AX", 0);
 	private Register programCounter = new Register("PC", 0);
@@ -65,8 +67,9 @@ public class Processor {
 		this.wait = wait;
 	}
 
-	public Processor(RAM ram) {
+	public Processor(RAM ram, JEditorPane debugLog) {
 		this.ram = ram;
+		this.debugLog = debugLog;
 	}
 	
 	public void write(int value, int address) {
@@ -185,11 +188,14 @@ public class Processor {
 			//execute();
 		}
 		else if(com == 901) {
-			accumulator.update(Integer.valueOf(JOptionPane.showInputDialog("Giriþ yapýnýz: ")));
+			int retVal = Integer.valueOf(JOptionPane.showInputDialog("Giriþ yapýnýz: "));
+			debugLog.setText(debugLog.getText() + "Input: " + retVal + "\n");
+			accumulator.update(retVal);
 			programCounter.increment();
 			//execute();
 		}
 		else if(com == 902) {
+			debugLog.setText(debugLog.getText() + "Output: " + accumulator.getValue() + "\n");
 			JOptionPane.showMessageDialog(null, "" + accumulator.getValue());
 			programCounter.increment();
 			//execute();

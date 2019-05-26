@@ -9,7 +9,6 @@ import java.awt.Color;
 import javax.swing.JEditorPane;
 import java.awt.Font;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -19,8 +18,11 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import java.awt.SystemColor;
+import java.awt.Window;
 import java.awt.FlowLayout;
 import java.awt.Component;
+import java.awt.EventQueue;
+
 import javax.swing.Box;
 import javax.swing.border.EtchedBorder;
 import javax.swing.JTable;
@@ -85,6 +87,7 @@ public class YeniPencere extends JFrame {
 	
 	private static final long serialVersionUID = -3151430061368571784L;
 	private JPanel contentPane;
+	private JEditorPane debugLog = new JEditorPane();
 	private int befAdr;
 	private int befIns;
 	private Timer timer;
@@ -104,6 +107,7 @@ public class YeniPencere extends JFrame {
 	private RAM ram;
 	private Processor cpu;
 	private JTable traceView;
+	private ShowSource window;
 	
 	int say = 0;
 	long top = 0;
@@ -240,9 +244,19 @@ public class YeniPencere extends JFrame {
 	}
 
 
-	public YeniPencere(RAM ram) {
+	public YeniPencere(RAM ram, String text) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					window = new ShowSource(text);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
 		this.ram = ram;
-		this.cpu = new Processor(ram);
+		this.cpu = new Processor(ram, debugLog);
 		try {
 			befIns = ram.write(0);
 		} catch (invalidAddressException e2) {
@@ -380,6 +394,11 @@ public class YeniPencere extends JFrame {
 		);
 		
 		JCheckBox chckbxKaynakKoduGster = new JCheckBox("Kaynak kodu göster");
+		chckbxKaynakKoduGster.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				window.frame.setVisible(chckbxKaynakKoduGster.isSelected());
+			}
+		});
 		chckbxKaynakKoduGster.setBackground(Color.LIGHT_GRAY);
 		panel_4.add(chckbxKaynakKoduGster);
 		
@@ -392,14 +411,14 @@ public class YeniPencere extends JFrame {
 		panel_10.setLayout(null);
 		panel_10.setBackground(Color.LIGHT_GRAY);
 		
-		JEditorPane editorPane = new JEditorPane();
-		editorPane.setText("test\r\n");
-		editorPane.setForeground(Color.WHITE);
-		editorPane.setFont(new Font("Consolas", Font.PLAIN, 14));
-		editorPane.setEditable(false);
-		editorPane.setBackground(new Color(0, 128, 0));
-		editorPane.setBounds(12, 13, 299, 266);
-		panel_10.add(editorPane);
+		
+		debugLog.setText("");
+		debugLog.setForeground(Color.WHITE);
+		debugLog.setFont(new Font("Consolas", Font.PLAIN, 14));
+		debugLog.setEditable(false);
+		debugLog.setBackground(new Color(0, 128, 0));
+		debugLog.setBounds(12, 13, 299, 266);
+		panel_10.add(debugLog);
 		
 		JLabel label_20 = new JLabel("I/O Log");
 		label_20.setFont(new Font("Tahoma", Font.PLAIN, 11));

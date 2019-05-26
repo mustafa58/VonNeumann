@@ -396,7 +396,14 @@ public class Assembler {
 	
 	public void parseDat(String text, RAM ram) throws invalidAddressException, regOverflowException {
 		text = text.replaceAll("//.*", "");
-		String str = text.split("[*]")[1].split("\n")[0];
+		String str;
+		try {
+			str = text.split("[*]")[1].split("\n")[0];
+		}
+		catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Uyarý! (geçerli bir hafýza bloðu tanýmýna rastlanmadý)");
+			throw new invalidAddressException();
+		}
 		Matcher m = Pattern.compile("[0-9]{1,3}").matcher(str);
 		m.find();
 		int offset = Integer.valueOf(m.group());
